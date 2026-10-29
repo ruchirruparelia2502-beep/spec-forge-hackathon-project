@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "specforge_output.v1",
+  "title": "SpecForge output file (outputs/specforge_output.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "input_id", "template", "course", "course_outcomes", "units", "co_po_pso_map", "teaching_hours", "assessment", "defects"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "input_id": {"type": "string", "description": "ID printed on the input pack, e.g. SAMPLE or H1"},
+    "template": {"enum": ["integrated", "non_lab"]},
+    "course": {
+      "type": "object", "additionalProperties": false,
+      "required": ["title", "code", "department", "credits_ltp", "course_type", "summary"],
+      "properties": {
+        "title": {"type": "string"}, "code": {"type": "string"},
+        "department": {"type": "string"},
+        "credits_ltp": {"type": "string", "pattern": "^\\d+:\\d+:\\d+$"},
+        "course_type": {"type": "string"}, "summary": {"type": "string"}
+      }
+    },
+    "course_outcomes": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "statement", "bloom_level"],
+        "properties": {"id": {"type": "string", "pattern": "^CO-\\d+$"}, "statement": {"type": "string"},
+          "bloom_level": {"type": "integer", "minimum": 1, "maximum": 6}}}
+    },
+    "units": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["number", "title"],
+        "properties": {"number": {"type": "integer"}, "title": {"type": "string"}, "lab": {"type": ["string", "null"]}}}
+    },
+    "co_po_pso_map": {
+      "type": "object",
+      "description": "Keys CO ids; inner keys PO-1..PO-11, PSO-1..PSO-n; value 1|2|3 or null for blank. Omitted cell = blank.",
+      "additionalProperties": {"type": "object", "propertyNames": {"pattern": "^(PO-([1-9]|1[01])|PSO-\\d+)$"},
+        "additionalProperties": {"type": ["object", "null"], "required": ["level"],
+          "properties": {"level": {"enum": [1, 2, 3]}, "justification": {"type": "string"}}}}
+    },
+    "teaching_hours": {"type": "object", "additionalProperties": {"type": "number"},
+      "description": "e.g. {lectures, lab, tests_exams, total}"},
+    "assessment": {
+      "type": "object", "required": ["components", "co_coverage"],
+      "properties": {
+        "components": {"type": "array", "items": {"type": "object", "required": ["name", "weight_percent"],
+          "properties": {"name": {"type": "string"}, "weight_percent": {"type": "number"}}}},
+        "co_coverage": {"type": "object", "description": "CO id -> list of component names assessing it",
+          "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+      }
+    },
+    "defects": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["code", "location", "description", "fix"],
+        "properties": {
+          "code": {"enum": ["CO_MISSING_IN_TABLE", "CO_EXTRA_IN_TABLE", "CO_ASSESSMENT_MISMATCH", "PSO_COLUMN_MISMATCH",
+            "MAPPING_BLOOM_MISMATCH", "MAPPING_UNSUPPORTED", "WRONG_TEMPLATE", "PLACEHOLDER_TEXT", "SUMMARY_SYLLABUS_MISMATCH",
+            "LABEL_OR_TITLE_MISMATCH", "HOURS_INCONSISTENT", "WEIGHTAGE_INCONSISTENT", "TYPO_OR_FORMAT", "SECTION_NOT_IN_TEMPLATE",
+            "MARKS_INCONSISTENT", "OTHER"]},
+          "location": {"type": "object", "required": ["source"], "additionalProperties": false,
+            "properties": {"source": {"enum": ["spec", "blueprint", "template"]},
+              "section": {"type": ["integer", "null"], "minimum": 1, "maximum": 12},
+              "refs": {"type": "array", "items": {"type": "string"}, "description": "CO-x / PO-x / PSO-x / Unit-x tokens involved"}}},
+          "description": {"type": "string"}, "fix": {"type": "string"}
+        }}
+    }
+  }
+}

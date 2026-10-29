@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Course Specifications Editor</title>
+<style>
+        :root {
+            --page-width: 210mm;
+            --static-bg: transparent;
+            --text-color: #211F1F;
+        }
+        
+        body {
+            font-family: Calibri, sans-serif;
+            background: #e8e8e8;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+        
+        .toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .toolbar h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .toolbar .toolbar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar button:hover {
+            background: #388e3c;
+        }
+
+        .toolbar .hint {
+            font-size: 12px;
+            color: #aaa;
+            margin-right: 8px;
+        }
+        
+        .page {
+            max-width: var(--page-width);
+            margin: 65px auto 30px auto;
+            background: white;
+            padding: 20mm 22mm;
+            box-shadow: 0 1px 12px rgba(0,0,0,0.12);
+            min-height: 297mm;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 10pt;
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        
+        h2 {
+            font-size: 10pt;
+            color: var(--text-color);
+            font-weight: bold;
+            margin-top: 1.5em;
+            margin-bottom: 0.6em;
+            
+            
+        }
+
+        h3 {
+            font-size: 10pt;
+            color: var(--text-color);
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.4em;
+        }
+        
+        p, li, td, th {
+            font-size: 10pt;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        p {
+            text-align: justify;
+            margin-top: 4px;
+            margin-bottom: 8px;
+        }
+        
+        ol {
+            margin-top: 0;
+            margin-bottom: 1em;
+            padding-left: 25px;
+            text-align: justify;
+        }
+        
+        li {
+            list-style-type: decimal;
+            margin-bottom: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.2em;
+        }
+        
+        table, th, td {
+            border: 1px solid #666;
+        }
+        
+        th, td {
+            padding: 5px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .static {
+            background-color: var(--static-bg);
+        }
+        
+        [contenteditable="true"] {
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            min-height: 1.2em;
+        }
+        
+        p[contenteditable="true"], div[contenteditable="true"], ul[contenteditable="true"] {
+            display: block;
+        }
+        
+        td[contenteditable="true"] {
+            display: table-cell;
+            border: 1px solid #666;
+        }
+
+        span[contenteditable="true"] {
+            display: inline;
+            border: none;
+        }
+        
+        [contenteditable="true"]:hover {
+            border-color: #90caf9;
+            background-color: #fafffe;
+        }
+
+        td[contenteditable="true"]:hover {
+            background-color: #f0f8ff;
+        }
+        
+        [contenteditable="true"]:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+            background-color: #fff;
+        }
+
+        td[contenteditable="true"]:focus {
+            background-color: #fff;
+            box-shadow: inset 0 0 0 2px rgba(25, 118, 210, 0.25);
+        }
+
+        span[contenteditable="true"]:hover {
+            border-bottom: 1px dashed #1976d2;
+        }
+
+        span[contenteditable="true"]:focus {
+            border-bottom: 2px solid #1976d2;
+            box-shadow: none;
+        }
+        
+        .assessment-integrated-table th,
+    .assessment-integrated-table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .assessment-integrated-table th {
+        font-weight: bold;
+    }
+
+    .assessment-integrated-table td[contenteditable="true"] {
+        min-width: 28px;
+    }
+
+    .unit-row {
+            margin-bottom: 10px;
+            text-align: justify;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+
+        .unit-label {
+            font-weight: bold;
+        }
+
+        /* CO-PO table compact styling */
+        .copo-table th, .copo-table td {
+            padding: 3px 4px;
+            font-size: 10pt;
+        }
+        
+        
+    
+        #table-context-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            z-index: 2000;
+            padding: 6px 0;
+            border-radius: 4px;
+            font-family: Calibri, sans-serif;
+            font-size: 10pt;
+        }
+        #table-context-menu .menu-item {
+            padding: 6px 20px;
+            cursor: pointer;
+            color: #333;
+        }
+        #table-context-menu .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+
+        ul.co-list {
+            list-style-type: none !important;
+            counter-reset: co-counter;
+            padding-left: 0;
+        }
+        ul.co-list li {
+            position: relative;
+            padding-left: 45px;
+            margin-bottom: 8px;
+            list-style-type: none !important;
+        }
+        ul.co-list li::before {
+            counter-increment: co-counter;
+            content: "CO" counter(co-counter) ": ";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+
+        
+
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm 15mm;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 9.5pt !important;
+        line-height: 1.35 !important;
+    }
+
+    .toolbar, #table-context-menu {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Headings stay attached to content */
+    h1, h2, h3, h4 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        margin-top: 1em !important;
+        margin-bottom: 0.4em !important;
+    }
+
+    h2 + p, h2 + table, h2 + ul, h2 + ol,
+    h3 + p, h3 + table, h3 + ul, h3 + ol,
+    p + ul, p + ol {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+    }
+
+    /* Lists pagination: allow lists to flow naturally across pages. */
+    ul, ol {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        margin-top: 0.3em !important;
+        margin-bottom: 0.6em !important;
+        orphans: 2;
+        widows: 2;
+    }
+
+    li {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Avoid leaving a heading or a single short paragraph stranded
+       at the bottom of a page. */
+    p {
+        orphans: 2;
+        widows: 2;
+    }
+
+    /* Tables: allow tables to use available page space efficiently.
+       Tables may continue onto the next page when necessary. */
+    table {
+        width: calc(100% - 2px) !important;
+        box-sizing: border-box !important;
+        border-collapse: collapse !important;
+        border: 1px solid #000 !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        margin-bottom: 0.8em !important;
+    }
+
+    /* Repeat table headings when a table continues onto another page. */
+    thead {
+        display: table-header-group !important;
+    }
+
+    /* Keep an individual row together whenever possible, but do not
+       prevent the table itself from flowing naturally across pages. */
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Keep table cell borders crisp and solid #000 in print */
+    th, td, td.static, td[contenteditable="true"] {
+        border: 1px solid #000 !important;
+        padding: 4px 6px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    /* Remove outline/background from non-table editable elements */
+    span[contenteditable="true"], span.static, div[contenteditable="true"] {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .unit-row {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 0.5em !important;
+    }
+}
+</style>
+
+<style id="copo-uniform-columns">
+/* Professional uniform column layout for the CO-PO-PSO map */
+table.copo-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+table.copo-table col.copo-co {
+    width: 7%;
+}
+
+table.copo-table col.copo-po,
+table.copo-table col.copo-pso {
+    width: 7.1538%;
+}
+
+table.copo-table th,
+table.copo-table td {
+    box-sizing: border-box;
+    text-align: center;
+    vertical-align: middle;
+    padding: 7px 4px;
+    overflow-wrap: break-word;
+}
+
+table.copo-table th:first-child,
+table.copo-table td:first-child {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Keep the grouped PO/PSO headings centered across their exact columns. */
+table.copo-table th[colspan] {
+    text-align: center;
+}
+</style>
+
+
+<style id="copo-legend-style">
+table.copo-table tr.copo-legend-row td {
+    background: #d9d9d9;
+    font-weight: 600;
+    text-align: center;
+    user-select: none;
+    cursor: default;
+}
+</style>
+
+
+<style id="copo-legend-final-style">
+table.copo-table tr.copo-legend-row td {
+    background: transparent !important;
+    font-family: Calibri, Arial, sans-serif !important;
+    font-size: 10pt !important;
+    font-weight: normal !important;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    cursor: default;
+    padding: 4px 6px;
+}
+</style>
+
+
+<style id="course-size-column-refinement">
+table.course-size-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+table.course-size-table td:first-child,
+table.course-size-table th:first-child {
+    width: 51.5% !important;
+}
+
+table.course-size-table td:nth-child(2),
+table.course-size-table th:nth-child(2) {
+    width: 48.5% !important;
+}
+</style>
+
+
+<style id="course-size-final-layout">
+table.course-size-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+table.course-size-table td:first-child,
+table.course-size-table th:first-child {
+    width: 57% !important;
+    min-width: 57% !important;
+}
+table.course-size-table td:nth-child(2),
+table.course-size-table th:nth-child(2) {
+    width: 43% !important;
+}
+table.course-size-table td:first-child {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+</style>
+
+
+<style id="global-calibri-11">
+html, body {
+    font-family: Calibri, Arial, sans-serif !important;
+    font-size: 11pt !important;
+}
+body, body * {
+    font-family: Calibri, Arial, sans-serif !important;
+}
+body {
+    font-size: 11pt !important;
+}
+</style>
+
+
+<style id="legend-normal-weight">
+table.copo-table tr.copo-legend-row td {
+    font-family: Calibri, Arial, sans-serif !important;
+    font-size: 10pt !important;
+    font-weight: normal !important;
+}
+</style>
+
+
+<style id="legend-bold-final">
+table.copo-table tr.copo-legend-row td {
+    font-family: Calibri, Arial, sans-serif !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    text-align: center;
+    background: transparent !important;
+    user-select: none;
+    cursor: default;
+}
+</style>
+
+</head>
+<body>
+<div class="toolbar">
+<h3>📄 Course Specifications Editor</h3>
+<div class="toolbar-right">
+<span class="hint">Right-click inside tables to add or remove rows/columns</span>
+<button onclick="downloadCoursePDF()">
+<svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path><rect height="8" width="12" x="6" y="14"></rect></svg>
+                Download as PDF
+            </button>
+</div>
+</div>
+<div class="page">
+<!-- TITLE -->
+<h1>
+<span class="static" style="padding: 2px 4px; border-radius: 2px;">Course Specifications:</span>
+<span contenteditable="true">Computer Vision</span>
+</h1>
+<table>
+<tbody>
+<tr>
+<td class="static" style="width: 40%; font-weight: bold;">Course Title</td>
+<td contenteditable="true">Computer Vision</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Course Code</td>
+<td contenteditable="true">AIC304A</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Course Type</td>
+<td contenteditable="true">Core</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Department</td>
+<td contenteditable="true">AIML</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Faculty</td>
+<td contenteditable="true">Engineering and Technology</td>
+</tr>
+</tbody>
+</table>
+<!-- COURSE SUMMARY -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">1. Course Summary</span></h2>
+<p contenteditable="true">This course introduces the fundamentals of Computer Vision, covering image formation, preprocessing, feature extraction, and segmentation techniques. It also explores machine learning models for image analysis and introduces the concept of Digital Twins in real-world vision-based applications.</p>
+<!-- COURSE SIZE AND CREDITS -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">2. Course Size and Credits:</span></h2>
+<table>
+<tbody>
+<tr>
+<td class="static" style="width: 50%; font-weight: bold;">Number of Credits</td>
+<td contenteditable="true">04</td>
+</tr>
+<tr>
+<td style="white-space: nowrap;" class="static" style="font-weight: bold;"><strong>Credit Structure (Lecture: Tutorial: Practical)</strong></td>
+<td contenteditable="true">3:2:0</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Total Hours of Interaction</td>
+<td contenteditable="true">75</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Number of Weeks in a Semester</td>
+<td contenteditable="true">15</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Department Responsible</td>
+<td contenteditable="true">Computer Science and Engineering</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Total Course Marks</td>
+<td contenteditable="true">100</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Pass Criterion</td>
+<td contenteditable="true">As per the Academic Regulations</td>
+</tr>
+<tr>
+<td class="static" style="font-weight: bold;">Attendance Requirement</td>
+<td contenteditable="true">As per the Academic Regulations</td>
+</tr>
+</tbody>
+</table>
+<!-- COURSE OUTCOMES -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">3. Course Outcomes (COs)</span></h2>
+<p class="static" style="padding: 2px 4px; border-radius: 2px;">After the successful completion of this course, the student will be able to:</p>
+<ul class="co-list" contenteditable="true">
+<li>Recall and explain the evolution, architecture, challenges, industry trends, and Human Visual System of computer vision.</li>
+<li>Apply digital image acquisition, colour modelling, spatial filtering, geometric transformations, and frequency-domain analysis techniques to enhance and restore images.</li>
+<li>Analyze image textures and salient features by implementing and comparing classical descriptors with deep CNN feature extractors (AlexNet, VGG, ResNet).</li>
+<li>Evaluate segmentation strategies and Vision Transformers (ViTs) by assessing their trade-offs in complex real-world scenarios.</li>
+<li>Design vision-enabled solutions integrating Digital Twins, Edge AI, and multimodal data for diagnostics, robotics, and smart-environment deployments.</li>
+</ul>
+<!-- COURSE CONTENTS -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">4. Course Contents</span></h2>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 1:</span> <span contenteditable="true">Introduction: History of Computer Vision Classical to Deep Learning, Applications of Computer Vision, Challenges and Recent Advances, Industry trends. Introduction to image processing, Human Visual system.</span>
+</div>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 2:</span> <span contenteditable="true">Digital Image Fundamentals: Human Visual System, A simple image model, Image Acquisition, Sampling and quantization, Relationships between pixels, Colour models: RGB, HSI, YUV Colour models.</span>
+</div>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 3:</span> <span contenteditable="true">Image Enhancement &amp; Restoration: Geometric Transformations Affine &amp; Projective; Fundamentals spatial processing: Point, Local and Global Operations, Spatial filters, Frequency filtering: Smoothing, Sharpening. Image Restoration, Denoising and Reconstruction Overview. Image features: Edge Detection, line, contours, and corner detection. (Marr-Hildreth, LoG, DoG, Canny, Harris).</span>
+</div>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 4:</span> <span contenteditable="true">Texture Analysis: Overview, Textures Features &amp; Descriptors, Texture Representation, Grey level Co-occurrence matrix, Texture Analysis. Salient feature Detection and Matching: Overview, SIFT, SURF, ORB, CNN feature extraction, Transfer learning with Pre-trained networks.</span>
+</div>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 5:</span> <span contenteditable="true">Image Segmentation: Region Growing, Region split, Region Merging, Segmentation as clustering: K-Means, Gaussian Mixture Model. Semantic Segmentation, Instance Segmentation, Panoptic Segmentation. Introduction to Transformers, Vision Transformers: ViTs, DINO, Patch-based Tokenization, Self-Attention for Images.</span>
+</div>
+<div class="unit-row">
+<span class="static unit-label" style="padding: 1px 3px; border-radius: 2px;">Unit 6:</span> <span contenteditable="true">Digital Twining: Introduction to Digital Twin, DT Architecture and Frameworks, Modeling and Simulation. Edge AI: Real-time vision on embedded systems and mobile devices, Multimodal Learning: Integrating vision with text, audio, and sensor data, IoT Integration: Vision-powered smart environments and industrial automation. Case studies: Automated diagnosis, Inspection (Factory monitoring: Analyse components for deviations, Robot vision, and Obstacle avoidance.</span>
+</div>
+<!-- CO-PO-PSO MAP -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">5. Course Map (CO-PO-PSO Map)</span></h2>
+<table class="copo-table">
+<colgroup>
+    <col class="copo-co">
+    <col class="copo-po"><col class="copo-po"><col class="copo-po">
+    <col class="copo-po"><col class="copo-po"><col class="copo-po">
+    <col class="copo-po"><col class="copo-po"><col class="copo-po">
+    <col class="copo-po"><col class="copo-po">
+    <col class="copo-pso"><col class="copo-pso">
+</colgroup>
+
+<thead>
+<tr>
+<th class="static"></th>
+<th class="static text-center" colspan="11">Programme Outcomes (POs)</th>
+<th class="static text-center" colspan="2">Programme Specific Outcomes (PSOs)</th>
+</tr>
+<tr>
+<th class="static"></th>
+<th class="static text-center">PO-1</th>
+<th class="static text-center">PO-2</th>
+<th class="static text-center">PO-3</th>
+<th class="static text-center">PO-4</th>
+<th class="static text-center">PO-5</th>
+<th class="static text-center">PO-6</th>
+<th class="static text-center">PO-7</th>
+<th class="static text-center">PO-8</th>
+<th class="static text-center">PO-9</th>
+<th class="static text-center">PO-10</th>
+<th class="static text-center">PO-11</th>
+
+<th class="static text-center">PSO-1</th>
+<th class="static text-center">PSO-2</th>
+
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-center" contenteditable="true" style="font-weight:bold;">CO-1</td>
+<td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true"></td>
+</tr>
+<tr>
+<td class="text-center" contenteditable="true" style="font-weight:bold;">CO-2</td>
+<td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">1</td>
+</tr>
+<tr>
+<td class="text-center" contenteditable="true" style="font-weight:bold;">CO-3</td>
+<td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">2</td>
+</tr>
+<tr>
+<td class="text-center" contenteditable="true" style="font-weight:bold;">CO-4</td>
+<td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td>
+</tr>
+<tr>
+<td class="text-center" contenteditable="true" style="font-weight:bold;">CO-5</td>
+<td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">1</td><td class="text-center" contenteditable="true">2</td><td class="text-center" contenteditable="true">3</td><td class="text-center" contenteditable="true">3</td>
+</tr>
+<tr class="copo-legend-row">
+    <td class="static text-center" colspan="14"><strong>3: Very Strong Contribution, 2: Strong Contribution, 1: Moderate Contribution</strong></td>
+</tr>
+</tbody>
+</table>
+<!-- TEACHING AND LEARNING METHODS -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">6. Course Teaching and Learning Methods</span></h2>
+<table>
+<thead>
+<tr>
+<th class="static">Teaching and Learning Methods</th>
+<th class="static">Duration in hours</th>
+<th class="static">Total Duration in Hours</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" class="static"><strong>Face to Face Lectures</strong></td>
+<td contenteditable="true">45</td>
+</tr>
+<tr>
+<td colspan="2" class="static"><strong>Demonstrations</strong></td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">1. Demonstration using Videos</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">2. Demonstration using Physical Models / Systems</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">3. Demonstration on a Computer</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td colspan="2" class="static"><strong>Numeracy</strong></td>
+<td contenteditable="true">30</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">1. Solving Numerical Problems</td>
+<td contenteditable="true">15</td>
+<td contenteditable="true">30</td>
+</tr>
+<tr>
+<td colspan="2" class="static"><strong>Practicals</strong></td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">1. Course Laboratory</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">2. Computer Laboratory</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">3. Engineering Workshop / Course/Workshop / Kitchen</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">4. Clinical Laboratory</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">5. Hospital</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">6. Model Studio</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td colspan="2" class="static"><strong>Others</strong></td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">1. Case Study Presentation</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">2. Guest Lecture</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">3. Industry / Field Visit</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">4. Brain Storming Sessions</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">5. Group Discussions</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td class="static" style="padding-left: 20px;">6. Discussing Possible Innovations</td>
+<td contenteditable="true">00</td>
+<td contenteditable="true">00</td>
+</tr>
+<tr>
+<td colspan="2" class="static"><strong>Term Tests, Laboratory Examination/Written Examination</strong></td>
+<td contenteditable="true">10</td>
+</tr>
+<tr style="font-weight: bold;">
+<td class="static" style="font-weight: bold;">Total Duration in Hours</td>
+<td class="static"></td>
+<td contenteditable="true" style="font-weight: bold;">85</td>
+</tr>
+</tbody>
+</table>
+<!-- ASSESSMENT AND REASSESSMENT -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">7. Course Assessment and Reassessment</span></h2>
+<p contenteditable="true">The details of the components and subcomponents of course assessment are presented in the Programme Specifications document pertaining to the B.Tech. (Computer Science and Engineering) Programme. The procedure to determine the final course marks is also presented in the Programme Specifications document.</p>
+<p contenteditable="true">The evaluation questions are set to measure the attainment of the COs. In either component (CE or SEE) or subcomponent of CE, COs are assessed as illustrated in the following Table.</p>
+
+<table class="assessment-integrated-table">
+<thead>
+<tr>
+<th class="static text-center" colspan="7">Focus of COs on each Component or Subcomponent of Evaluation</th>
+</tr>
+<tr>
+<th class="static text-center" rowspan="4" style="vertical-align: middle;">Course<br>Outcome</th>
+<th class="static text-center" colspan="4">CE<br>(Weightage: 60 %)</th>
+<th class="static text-center" colspan="2">SEE<br>(Weightage: 40 %)</th>
+</tr>
+<tr>
+<th class="static text-center" colspan="2">Weightage: 30 %</th>
+<th class="static text-center">Weightage: 20 %</th>
+<th class="static text-center">Weightage: 10 %</th>
+<th class="static text-center">Weightage: 25 %</th>
+<th class="static text-center">Weightage: 15 %</th>
+</tr>
+<tr>
+<th class="static text-center">Term Test-1</th>
+<th class="static text-center">Term Test-2</th>
+<th class="static text-center">Assignments</th>
+<th class="static text-center">Lab</th>
+<th class="static text-center">Written Exam</th>
+<th class="static text-center">Lab Exam</th>
+</tr>
+<tr>
+<th class="static text-center">25 Marks</th>
+<th class="static text-center">25 Marks</th>
+<th class="static text-center">20 Marks</th>
+<th class="static text-center">10 Marks</th>
+<th class="static text-center">50 Marks</th>
+<th class="static text-center">25 Marks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="static text-center" style="font-weight: bold;">CO-1</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+</tr>
+<tr>
+<td class="static text-center" style="font-weight: bold;">CO-2</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+</tr>
+<tr>
+<td class="static text-center" style="font-weight: bold;">CO-3</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+</tr>
+<tr>
+<td class="static text-center" style="font-weight: bold;">CO-4</td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true">X</td>
+<td class="text-center" contenteditable="true"></td>
+<td class="text-center" contenteditable="true">X</td>
+</tr>
+<tr>
+<td class="static text-center" style="font-weight: bold;">CO-5</td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td><td class="text-center" contenteditable="true"></td>
+</tr>
+<tr>
+<td class="static" colspan="7" style="font-style: italic;">The details of number of tests and assignments to be conducted are presented in the Academic Regulations and Programme Specifications Document.</td>
+</tr>
+</tbody>
+</table>
+
+<p contenteditable="true">The Course Leader assigned to the course, in consultation with the Head of the Department, shall provide the focus of COs in each component of assessment in the above template at the beginning of the semester.</p>
+<p contenteditable="true">Course reassessment policies are presented in the Academic Regulations document.</p>
+<!-- ACHIEVING COs -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">8. Achieving COs</span></h2>
+<p class="static" style="padding: 2px 4px; border-radius: 2px;">The following skills are directly or indirectly imparted to the students in the following teaching and learning methods:</p>
+<table class="long-table">
+<thead>
+<tr>
+<th class="static" style="width: 60px;">S. No</th>
+<th class="static">Curriculum and Capabilities Skills</th>
+<th class="static">How imparted during the course</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="static text-center">1.</td><td class="static">Knowledge</td><td class="static">Classroom lectures</td></tr>
+<tr><td class="static text-center">2.</td><td class="static">Understanding</td><td class="static">Classroom lectures, Self-study</td></tr>
+<tr><td class="static text-center">3.</td><td class="static">Critical Skills</td><td class="static">Assignment</td></tr>
+<tr><td class="static text-center">4.</td><td class="static">Analytical Skills</td><td class="static">Assignment</td></tr>
+<tr><td class="static text-center">5.</td><td class="static">Problem Solving Skills</td><td class="static">Assignment, Examination</td></tr>
+<tr><td class="static text-center">6.</td><td class="static">Practical Skills</td><td class="static">Assignment</td></tr>
+<tr><td class="static text-center">7.</td><td class="static">Group Work</td><td class="static">--</td></tr>
+<tr><td class="static text-center">8.</td><td class="static">Self-Learning</td><td class="static">Self-study</td></tr>
+<tr><td class="static text-center">9.</td><td class="static">Written Communication Skills</td><td class="static">Assignment, Examination</td></tr>
+<tr><td class="static text-center">10.</td><td class="static">Verbal Communication Skills</td><td class="static">--</td></tr>
+<tr><td class="static text-center">11.</td><td class="static">Presentation Skills</td><td class="static">--</td></tr>
+<tr><td class="static text-center">12.</td><td class="static">Behavioral Skills</td><td class="static">--</td></tr>
+<tr><td class="static text-center">13.</td><td class="static">Information Management</td><td class="static">Assignment</td></tr>
+<tr><td class="static text-center">14.</td><td class="static">Personal Management</td><td class="static">--</td></tr>
+<tr><td class="static text-center">15.</td><td class="static">Leadership Skills</td><td class="static">--</td></tr>
+</tbody>
+</table>
+<!-- COURSE RESOURCES -->
+<h2><span class="static" style="padding: 1px 4px; border-radius: 2px;">9. Course Resources</span></h2>
+<div style="margin-left: 20px;">
+<h3 style="font-size: 10pt; margin-top: 1em; font-weight: bold;"><span class="static" style="padding: 1px 4px; border-radius: 2px;">a.   Essential Reading</span></h3>
+<ol contenteditable="true" style="list-style-type: decimal; padding-left: 40px; margin-bottom: 1em;">
+<li>Class notes</li>
+<li>R.C. Gonzalez and R.E. Woods, 2018, Digital Image Processing, 4th Edition, Pearson. ISBN-13: 978-1292223070</li>
+<li>Nicholas Locascio and Nikhil Buduma, 2017, Fundamentals of Deep Learning: Designing Next-Generation Machine Intelligence Algorithms - O'Reilly</li>
+<li>Soheil Sabri, Kostas Alexandridis, Newton Lee, 2024, Digital Twin Fundamentals and Applications, Springer Nature</li>
+</ol>
+<h3 style="font-size: 10pt; margin-top: 1em; font-weight: bold;"><span class="static" style="padding: 1px 4px; border-radius: 2px;">b.   Recommended Reading</span></h3>
+<ol contenteditable="true" style="list-style-type: decimal; padding-left: 40px; margin-bottom: 1em;">
+<li>R. Szeliski, 2010, Computer Vision: Algorithms and Application, Springer-Verlag Inc.</li>
+<li>D. A. Forsyth, J. Ponce, 2003, Computer Vision: A Modern Approach, Pearson Education.</li>
+</ol>
+<h3 style="font-size: 10pt; margin-top: 1em; font-weight: bold;"><span class="static" style="padding: 1px 4px; border-radius: 2px;">c.   Magazines and Journals</span></h3>
+<ol contenteditable="true" style="list-style-type: decimal; padding-left: 40px; margin-bottom: 1em;">
+<li>IEEE-T-PAMI (IEEE Transactions on Pattern Analysis and Machine Intelligence).</li>
+<li>IJCV (International Journal of Computer Vision) - Springer.</li>
+<li>IEEE Transactions on Image Processing</li>
+</ol>
+<h3 style="font-size: 10pt; margin-top: 1em; font-weight: bold;"><span class="static" style="padding: 1px 4px; border-radius: 2px;">d.   Websites</span></h3>
+<ol contenteditable="true" style="list-style-type: decimal; padding-left: 40px; margin-bottom: 1em;">
+<li>https://www.coursera.org/</li>
+<li>http://nptel.ac.in/</li>
+</ol>
+<h3 style="font-size: 10pt; margin-top: 1em; font-weight: bold;"><span contenteditable="true">e.   Other Electronic Resources</span></h3>
+<ol contenteditable="true" style="list-style-type: decimal; padding-left: 40px; margin-bottom: 1em;">
+<li>https://ocw.mit.edu/index.htm</li>
+</ol>
+</div>
+
+<script>
+function getCourseTitleForPDF() {
+    // The highlighted editable text after "Course Specifications:" is
+    // the authoritative filename source.
+    const editableTitle = document.querySelector('h1 span[contenteditable="true"]');
+
+    if (editableTitle) {
+        const value = editableTitle.innerText.trim();
+        if (value) return value;
+    }
+
+    return 'Course Specifications';
+}
+
+function sanitizePDFFileName(name) {
+    return name
+        .replace(/[<>:"/\|?*\x00-\x1F]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/[. ]+$/, '') || 'Course Specifications';
+}
+
+function downloadCoursePDF() {
+    const courseTitle = sanitizePDFFileName(getCourseTitleForPDF());
+    const originalTitle = document.title;
+
+    // Set the page title first and give the browser a moment to commit the
+    // new title before opening the print dialog. Chrome/Edge use this title
+    // for the default Save-to-PDF filename.
+    document.title = courseTitle;
+
+    window.addEventListener('afterprint', function restoreTitle() {
+        document.title = originalTitle;
+    }, { once: true });
+
+    setTimeout(function () {
+        window.print();
+    }, 100);
+}
+</script>
+
+<script>
+        let targetCell = null;
+        const menu = document.createElement('div');
+        menu.id = 'table-context-menu';
+        menu.innerHTML = `
+            <div class="menu-item" onclick="addRow(true)">Insert Row Above</div>
+            <div class="menu-item" onclick="addRow(false)">Insert Row Below</div>
+            <div class="menu-item" onclick="deleteRow()">Delete Row</div>
+            <div style="border-top: 1px solid #eee; margin: 4px 0;"></div>
+            <div class="menu-item" onclick="addColumn(true)">Insert Column Left</div>
+            <div class="menu-item" onclick="addColumn(false)">Insert Column Right</div>
+            <div class="menu-item" onclick="deleteColumn()">Delete Column</div>
+        `;
+        document.body.appendChild(menu);
+
+        document.addEventListener('contextmenu', function(e) {
+            let td = e.target.closest('td, th');
+            if (td && td.closest('table')) {
+                e.preventDefault();
+                targetCell = td;
+                menu.style.display = 'block';
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+            } else {
+                menu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            menu.style.display = 'none';
+        });
+
+        function addRow(above) {
+            if (!targetCell) return;
+            const tr = targetCell.closest('tr');
+            const newTr = tr.cloneNode(true);
+            Array.from(newTr.cells).forEach(cell => {
+                if (cell.getAttribute('contenteditable') === 'true' || !cell.classList.contains('static')) {
+                    cell.innerHTML = '';
+                }
+            });
+            if (above) tr.parentNode.insertBefore(newTr, tr);
+            else tr.parentNode.insertBefore(newTr, tr.nextSibling);
+        }
+
+        function deleteRow() {
+            if (!targetCell) return;
+            const tr = targetCell.closest('tr');
+            tr.parentNode.removeChild(tr);
+        }
+
+        function addColumn(left) {
+            if (!targetCell) return;
+            const tr = targetCell.closest('tr');
+            const table = targetCell.closest('table');
+            
+            let cellIndex = -1;
+            const cells = Array.from(tr.cells);
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i] === targetCell) {
+                    cellIndex = i;
+                    break;
+                }
+            }
+            
+            if (cellIndex === -1) return;
+
+            Array.from(table.rows).forEach(row => {
+                if (cellIndex < row.cells.length) {
+                    const refCell = row.cells[cellIndex];
+                    const newCell = refCell.cloneNode(true);
+                    if (newCell.getAttribute('contenteditable') === 'true' || !newCell.classList.contains('static')) {
+                        newCell.innerHTML = '';
+                    }
+                    if (left) row.insertBefore(newCell, refCell);
+                    else row.insertBefore(newCell, refCell.nextSibling);
+                }
+            });
+        }
+
+        function deleteColumn() {
+            if (!targetCell) return;
+            const tr = targetCell.closest('tr');
+            const table = targetCell.closest('table');
+            let cellIndex = -1;
+            const cells = Array.from(tr.cells);
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i] === targetCell) {
+                    cellIndex = i;
+                    break;
+                }
+            }
+            
+            if (cellIndex === -1) return;
+            
+            Array.from(table.rows).forEach(row => {
+                if (cellIndex < row.cells.length) {
+                    row.removeChild(row.cells[cellIndex]);
+                }
+            });
+        }
+    </script>
+</div></body>
+</html>

@@ -1,0 +1,102 @@
+{
+  "scale": "3 = very strong, 2 = strong, 1 = moderate contribution. Leave a cell empty (null) when there is no relation.",
+  "pos": [
+    {
+      "id": "PO-1",
+      "title": "Engineering Knowledge",
+      "statement": "Apply knowledge of mathematics, natural science, computing, engineering fundamentals and an engineering specialization (WK1–WK4) to develop solutions to complex engineering problems."
+    },
+    {
+      "id": "PO-2",
+      "title": "Problem Analysis",
+      "statement": "Identify, formulate, review research literature and analyse complex engineering problems, reaching substantiated conclusions with consideration for sustainable development (WK1–WK4)."
+    },
+    {
+      "id": "PO-3",
+      "title": "Design / Development of Solutions",
+      "statement": "Design creative solutions for complex engineering problems and design or develop systems, components or processes to meet identified needs, with consideration for public health and safety, whole-life cost, net-zero carbon, culture, society and environment as required (WK5)."
+    },
+    {
+      "id": "PO-4",
+      "title": "Conduct Investigations of Complex Problems",
+      "statement": "Conduct investigations of complex engineering problems using research-based knowledge, including design of experiments, modelling, analysis and interpretation of data, to provide valid conclusions (WK8)."
+    },
+    {
+      "id": "PO-5",
+      "title": "Engineering Tool Usage",
+      "statement": "Create, select and apply appropriate techniques, resources and modern engineering and IT tools, including prediction and modelling, recognising their limitations, to solve complex engineering problems (WK2, WK6)."
+    },
+    {
+      "id": "PO-6",
+      "title": "The Engineer and the World",
+      "statement": "Analyse and evaluate societal and environmental aspects while solving complex engineering problems, for their impact on sustainability with reference to economy, health, safety, legal framework, culture and environment (WK1, WK5, WK7)."
+    },
+    {
+      "id": "PO-7",
+      "title": "Ethics",
+      "statement": "Apply ethical principles and commit to professional ethics, human values, diversity and inclusion; adhere to national and international laws (WK9)."
+    },
+    {
+      "id": "PO-8",
+      "title": "Individual and Collaborative Teamwork",
+      "statement": "Function effectively as an individual, and as a member or leader in diverse and multidisciplinary teams."
+    },
+    {
+      "id": "PO-9",
+      "title": "Communication",
+      "statement": "Communicate effectively and inclusively within the engineering community and society at large: comprehend and write effective reports and design documentation, and make effective presentations, considering cultural, language and learning differences."
+    },
+    {
+      "id": "PO-10",
+      "title": "Project Management and Finance",
+      "statement": "Apply knowledge and understanding of engineering management principles and economic decision-making to one’s own work, as a member and leader in a team, and to manage projects in multidisciplinary environments."
+    },
+    {
+      "id": "PO-11",
+      "title": "Life-Long Learning",
+      "statement": "Recognise the need for, and have the preparation and ability for, independent and life-long learning, adaptability to new and emerging technologies, and critical thinking in the broadest context of technological change (WK8)."
+    }
+  ],
+  "psos": [
+    {
+      "id": "PSO-1",
+      "statement": "Apply knowledge of computing fundamentals, algorithms, data structures and programming to analyse and solve computational problems."
+    },
+    {
+      "id": "PSO-2",
+      "statement": "Design and develop software solutions using modern tools, platforms and practices."
+    }
+  ],
+  "blooms": [
+    {
+      "level": "L1",
+      "name": "Remember",
+      "verbs": "Define, list, recall, state, name, identify"
+    },
+    {
+      "level": "L2",
+      "name": "Understand",
+      "verbs": "Explain, describe, summarise, classify, discuss, interpret"
+    },
+    {
+      "level": "L3",
+      "name": "Apply",
+      "verbs": "Apply, solve, use, implement, compute, demonstrate"
+    },
+    {
+      "level": "L4",
+      "name": "Analyse",
+      "verbs": "Analyse, compare, differentiate, examine, distinguish, select (for a purpose)"
+    },
+    {
+      "level": "L5",
+      "name": "Evaluate",
+      "verbs": "Evaluate, assess, justify, critique, judge, recommend"
+    },
+    {
+      "level": "L6",
+      "name": "Create",
+      "verbs": "Design, develop, build, construct, formulate, propose"
+    }
+  ]
+}

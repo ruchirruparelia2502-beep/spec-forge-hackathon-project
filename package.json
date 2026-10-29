@@ -1,0 +1,35 @@
+{
+  "name": "specforge-starter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c cyan,yellow \"vite\" \"tsx watch server/index.ts\"",
+    "start": "tsx server/index.ts",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "check": "tsx scripts/check-output.ts",
+    "verify": "tsx scripts/verify-run.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "express": "^4.19.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8",
+    "multer": "^1.4.5-lts.1",
+    "tsx": "^4.16.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "ajv": "^8.17.1",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
+    "@types/multer": "^1.4.12"
+  }
+}

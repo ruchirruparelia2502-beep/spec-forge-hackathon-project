@@ -1,0 +1,235 @@
+{
+  "spec_name": "SpecForge Buildathon: prompt pack",
+  "version": "3",
+  "how_to_use": [
+    "Open the starter repo in your AI tool. It already contains AGENTS.md (also CLAUDE.md, GEMINI.md and a Cursor rule) with the stack rules, so your tool reads them on its own. If your tool does not, paste the STACK RULES block (stack_header) first.",
+    "Paste the prompt for your current level. From L3 onwards also paste the OUTPUT FILE block.",
+    "Every level prompt starts with the same working habit (the WORKING RULES line below). Keep it: plan first, build small, audit yourself. This is what the winners of the Claude hackathons did, and it saves you the most time.",
+    "Pick ONE provider and bring your own key. Gemini: free key at aistudio.google.com. OpenRouter: key at openrouter.ai with a free model (filter the models page by free). Paste it in your app's Settings panel, not in the code. If one provider is rate-limited, switch the provider in Settings; no code changes needed. Stuck on the key? The help desk will help you.",
+    "Do one level at a time. Run it, check the 'done when' line, then commit with a message that starts with the level, e.g. 'L3: map with justifications'.",
+    "If it breaks, use the level's 'if_broken' prompt. If it works but looks bad, use 'if_ugly'.",
+    "Never paste API keys into prompts or commit them. Do not hard-code any course content: the app must work on courses it has never seen.",
+    "Your live score comes from the files you upload. Your FINAL score comes from the organisers running your code: at 15:45 they take your last commit, run npm install and npm start, and call POST /api/v1/generate with the sample files. Keep npm run verify passing.",
+    "Before you export or submit, run: npm run check. Fix every line it prints."
+  ],
+  "stack_header": "STACK RULES (follow in every answer): Build a TypeScript project. Frontend: React 18 with Vite. Backend: Node.js 20 with Express, all routes under /api/v1. Validate data with Zod. Every API reply is JSON shaped { \"success\": true, \"data\": ... } or { \"success\": false, \"error\": { \"message\": \"...\", \"code\": \"MACHINE_CODE\" } } with correct HTTP status codes (400 bad input, 403 not permitted, 404 not found, 500 server error). Never put API keys in source code or commit them: the user enters their own key in the app (see AI PROVIDER RULES). Use a simple role switcher (Author, Reviewer, HOD) instead of real login, and check permissions on the server for every action. No database needed: keep data in memory or in a JSON file. Write simple, readable code. Never hard-code any course content (course code, title, CO text, mappings): the app must work on courses it has never seen. AI PROVIDER RULES (bring your own key): The app has a Settings panel (a gear button in the header) where the user chooses a provider ('gemini' or 'openrouter'), pastes their own API key into a password field, and types a model name, with a 'Test key' button and a 'Clear key' button. The key is saved only in the browser (localStorage) and is sent to the backend in request headers (x-llm-provider, x-llm-key, x-llm-model) on every call that needs the AI. The backend never stores, logs or returns the key, and it never appears in the output file, the README or any commit. All AI calls go through ONE small module (server/llm.ts) with a single function generateJson(prompt, zodSchema, config) that returns validated JSON: for 'gemini' it uses the @google/genai package; for 'openrouter' it uses a plain fetch to https://openrouter.ai/api/v1/chat/completions (OpenAI-compatible, header 'Authorization: Bearer <key>'). Ask for JSON only, strip any code fences from the reply, validate with Zod, retry once on invalid output, and return a clear error on rate limits (HTTP 429) or a missing key ('Add your key in Settings'). Nothing else in the app may call a provider directly.",
+  "output_file_block": "OUTPUT FILE: the app writes one JSON object (called specforge_output) with exactly these keys and no others: schema_version (always \"1.0\"), input_id (exactly \"SAMPLE\" when running on the sample kit), template (\"integrated\" or \"non_lab\"), course { title, code, department, credits_ltp as \"3:0:1\", course_type, summary }, course_outcomes [ { id like \"CO-1\", statement, bloom_level 1-6 } ], units [ { number, title, lab (text or null) } ], co_po_pso_map { \"CO-1\": { \"PO-1\": { level 1|2|3, justification }, \"PSO-1\": {...} } } (leave blank cells out; columns are PO-1..PO-11 and PSO-1, PSO-2), teaching_hours { lectures, lab, tests_exams, total } (use exactly these key names), assessment { components [ { name, weight_percent } ], co_coverage { \"CO-1\": [ component names ] } }, defects [ { code, location { source: \"spec\"|\"blueprint\"|\"template\", section: 1-12 or null, refs: [ \"CO-5\", ... ] }, description, fix } ]. The full schema is in specforge_output.schema.json in the starter repo.",
+  "tracks": {
+    "guided": "Google AI Studio Build mode (browser, built-in GitHub sync). Start from the starter repo with Import from GitHub, then use the level prompts.",
+    "coder": "Your own editor with AI help (Cursor, VS Code with Copilot, or Gemini CLI). Same stack, same prompts, same scoring."
+  },
+  "source_of_truth_rules": [
+    "Template choice: a non-zero Practical value in the credit structure (e.g. 3:0:1) or a course type containing 'laboratory' means the Integrated template; otherwise the Non-Lab template. The Author can override with a reason.",
+    "Course Outcomes and unit-wise syllabus come from the blueprint. Everything else comes from the existing spec.",
+    "With no blueprint, take COs and units from the existing spec and say 'no blueprint supplied' in the validation report.",
+    "Content with no place in the template (e.g. a section 10) is not added to the body; list it in the validation report.",
+    "None of the template's sample text (Computer Vision, AIC304A, AIML and so on) may survive into the output.",
+    "When sources disagree or a source contradicts itself, apply these rules and record the conflict: what, where, value chosen, why."
+  ],
+  "co_po_mapping_rules": [
+    "Scale: 3 very strong, 2 strong, 1 moderate, blank none. No other values.",
+    "Bloom's level comes from the CO's leading verb: L1 Remember (define, list, recall, state), L2 Understand (explain, describe, summarise, classify), L3 Apply (apply, solve, use, implement), L4 Analyse (analyse, compare, differentiate, select), L5 Evaluate (evaluate, assess, justify, critique), L6 Create (design, develop, build, construct).",
+    "Every CO maps to at least one PO. Each CO in Section 3 has exactly one row in Section 5, no extra rows.",
+    "A CO cannot map more strongly to a PO than its Bloom's level supports (an L2 'Explain' CO with PO-3 design = 3 is wrong).",
+    "PO-5 needs real tool use (lab, programming). PO-6 to PO-10 need explicit evidence in the syllabus or assessment; no evidence means blank.",
+    "A CO mapped 2 or 3 to PO-3 or PO-5 must be assessed in a practical or assignment component.",
+    "Each non-empty cell has a one-line justification. Use exactly the PSO columns the template has (PSO-1, PSO-2).",
+    "Load PO and PSO statements from config/po_pso.json, never hard-code them in the logic."
+  ],
+  "validation_rules": [
+    {
+      "id": "V1",
+      "rule": "CO count is identical in Sections 3, 5 and 7."
+    },
+    {
+      "id": "V2",
+      "rule": "Every CO is mapped to at least one PO."
+    },
+    {
+      "id": "V3",
+      "rule": "Every CO is assessed in at least one component."
+    },
+    {
+      "id": "V4",
+      "rule": "No CO id appears in any table that is not defined in Section 3."
+    },
+    {
+      "id": "V5",
+      "rule": "Teaching hours rows add up to the stated total."
+    },
+    {
+      "id": "V6",
+      "rule": "Continuous-evaluation plus end-exam weightages total 100%."
+    },
+    {
+      "id": "V7",
+      "rule": "No template sample text remains (collect the sample strings from the template when it loads)."
+    },
+    {
+      "id": "V8",
+      "rule": "PSO columns match the programme (PSO-1 and PSO-2 only)."
+    },
+    {
+      "id": "V9",
+      "rule": "Mapping values are only 1, 2, 3 or blank; no CO exceeds its Bloom's ceiling; strong PO-3/PO-5 COs are assessed in a practical or assignment component."
+    },
+    {
+      "id": "V10",
+      "rule": "Template choice matches the credit/course-type rule, or an override reason is recorded."
+    }
+  ],
+  "defect_codes": [
+    "CO_MISSING_IN_TABLE",
+    "CO_EXTRA_IN_TABLE",
+    "CO_ASSESSMENT_MISMATCH",
+    "PSO_COLUMN_MISMATCH",
+    "MAPPING_BLOOM_MISMATCH",
+    "MAPPING_UNSUPPORTED",
+    "WRONG_TEMPLATE",
+    "PLACEHOLDER_TEXT",
+    "SUMMARY_SYLLABUS_MISMATCH",
+    "LABEL_OR_TITLE_MISMATCH",
+    "HOURS_INCONSISTENT",
+    "WEIGHTAGE_INCONSISTENT",
+    "TYPO_OR_FORMAT",
+    "SECTION_NOT_IN_TEMPLATE",
+    "MARKS_INCONSISTENT",
+    "OTHER"
+  ],
+  "levels": {
+    "L0": {
+      "name": "Spawn",
+      "time": "11:35-11:55",
+      "xp": 10,
+      "main": "The starter repo already has the React + Vite frontend, the Express backend, the Settings panel, server/llm.ts and GET /api/v1/llm-check. Do not rebuild them. Do this: (1) run npm install and npm run dev and confirm the home page loads; (2) read AGENTS.md and the files in src/ and server/ and summarise in five lines how the app is organised; (3) change the header to 'SpecForge - Course Specification Builder', add a role dropdown (Author, Reviewer, HOD) and an 'Upload files' button that does nothing yet; (4) make sure GET /api/v1/health returns { success: true, data: { status: 'up' } }; (5) update the README with run steps and a line for AI tools used. If a required piece is missing from the starter, add it following the AI PROVIDER RULES.",
+      "if_broken": "The app does not start or the preview is blank. Show me the exact error, fix it, and keep the same features and stack.",
+      "if_ugly": "Make the layout clean: a centered card, readable fonts, and university blue (#1a3d7c).",
+      "done_when": "The home page loads, /api/v1/health answers, you saved your key in Settings and 'Test key' says it works, your first commit is pushed to GitHub and the repo link is submitted."
+    },
+    "L1": {
+      "name": "Reader",
+      "time": "12:00-12:25",
+      "xp": 15,
+      "main": "Follow the WORKING RULES (plan first, then build, then audit). Add an upload page for an existing course specification (required) and a question-paper blueprint (optional). Accept .docx, .pdf, .html and .doc. Add POST /api/v1/parse (multipart/form-data, fields 'spec' and 'blueprint'). Extract the text and tables on the server: mammoth for .docx, pdf-parse for .pdf, cheerio for .html, and word-extractor for .doc (if a file cannot be read, return a clear error). Then call generateJson from server/llm.ts to turn the text into structured data: course code, title, department, credits as L:T:P, course type, the list of Course Outcomes with the leading verb and Bloom's level, units with title, content and hours, the existing CO-PO map, the teaching-hours table, the assessment table, and the resources. Validate the result with Zod. Show the JSON in a collapsible panel and the main fields in an editable form.",
+      "if_broken": "Extraction returns empty or wrong fields. Log the raw extracted text, show it to me, and fix the parser for this file type only.",
+      "if_ugly": "Show each CO as a card with its Bloom's level as a coloured badge.",
+      "done_when": "Uploading the sample blueprint and spec shows the correct number of COs and units.",
+      "checks": [
+        "Uploading the sample spec and blueprint shows the right number of COs and units.",
+        "Credits show as L:T:P, for example 3:0:1.",
+        "A file that cannot be read shows a clear message, not a crash.",
+        "No course text is written in the source code."
+      ]
+    },
+    "L2": {
+      "name": "Template",
+      "time": "12:25-12:45",
+      "xp": 10,
+      "main": "Follow the WORKING RULES (plan first, then build, then audit). Add template selection. Use the rule: a non-zero Practical value in the credit structure, or a course type containing 'laboratory', means the Integrated template; otherwise Non-Lab. Show 'Detected: Integrated' or 'Detected: Non-Lab' with the signals used, and a manual override with a reason. Load the two official HTML templates from the /templates folder and fill them from the parsed data with cheerio: keep headings, numbering, table layout, CSS and the Download as PDF button, replace the sample content. When a template loads, collect its sample strings (course title, code, department, sample units) into a list for the validation step. Course Outcomes and units come from the blueprint when there is one; everything else from the existing spec. Add an 'Export spec' button that downloads the filled document as spec.html (one self-contained HTML file).",
+      "if_broken": "The template choice is wrong on my file. Show me the signals you used and let the manual override win.",
+      "if_ugly": "Make the rendered spec look like an official printed document.",
+      "done_when": "The preview shows the right template for both sample files with no sample-course text left.",
+      "checks": [
+        "The sample course picks the correct template and shows the signals used.",
+        "The manual override changes the template and asks for a reason.",
+        "The preview contains no text from the template's sample course.",
+        "Export spec downloads spec.html, and it opens correctly on its own."
+      ]
+    },
+    "L3": {
+      "name": "Mapper",
+      "time": "12:45-13:40",
+      "xp": 20,
+      "main": "Follow the WORKING RULES (plan first, then build, then audit). Generate the CO-PO-PSO map and the scoring file. Load PO and PSO statements from config/po_pso.json. For each CO, ask generateJson for the Bloom's level and, for each PO and PSO, a strength of 3, 2, 1 or blank with a one-line justification, following the mapping rules (paste the co_po_mapping_rules). Ask it to rewrite the course summary so that it covers all units. Validate the AI reply with Zod, retry once if it is invalid. Show the map as a table: colour cells by strength and show the justification on hover; the Author can edit any cell. Then build the full specforge_output object (paste the OUTPUT FILE block), validate it with Zod, and add a button 'Export output' that downloads specforge_output.json with input_id 'SAMPLE' when the sample is loaded. Then replace the 501 stub of POST /api/v1/generate in server/index.ts: it receives the files (multipart: 'spec' required, 'blueprint' optional) and the x-llm-* headers, runs the whole pipeline with no clicks, and returns { success: true, data: { output: <the specforge_output object>, html: <the filled spec document as one HTML string> } }. The final score comes from the organisers calling this route on your code, so it must work after a fresh npm install and npm start. Leave defects as an empty list for now.",
+      "if_broken": "The AI returns invalid JSON or the wrong matrix size. Add a response schema, validate it with Zod, and retry once.",
+      "if_ugly": "Add a legend: 3 dark, 2 medium, 1 light.",
+      "done_when": "npm run verify passes, and your two files (specforge_output.json and spec.html) are accepted on the submit page (your first score).",
+      "checks": [
+        "Every CO has a row in the map and every PO and PSO has a cell (strength 3, 2, 1 or empty).",
+        "Every filled cell has a one-line justification.",
+        "With the app running, npm run verify saves outputs/specforge_output.json and outputs/spec.html and says the file looks good.",
+        "input_id is exactly SAMPLE for the sample files."
+      ]
+    },
+    "L4": {
+      "name": "Inspector",
+      "time": "13:40-14:05",
+      "xp": 15,
+      "main": "Follow the WORKING RULES (plan first, then build, then audit). Add a validation report written in plain code (not AI) that implements rules V1 to V10 (paste the validation_rules). Combine it with any conflicts the AI reported and with sections dropped from the existing spec. Show the report grouped by severity (High, Medium, Low) with the section, the value chosen and the reason, and let the user download it as validation_report.html. Also put every problem into the defects list of the output file: each defect has a code from this fixed list (paste the defect_codes), location.source ('spec' for the existing spec, 'blueprint' for the blueprint, 'template' for a wrong template choice or leftover template sample text), location.section (the section number 1-12 where the problem is, or null), location.refs (for example ['CO-5'] or ['PSO-3']), a description and the fix applied. Only report real problems.",
+      "if_broken": "A rule flags things that are fine. Show me the rule and the data it checked, then fix the rule.",
+      "if_ugly": "Group issues by severity with icons and a summary count at the top.",
+      "done_when": "The report lists real problems in the sample, and your exported file now has a defects list.",
+      "checks": [
+        "Each defect uses a code from the fixed list.",
+        "Each defect says where it is: source, section number and refs.",
+        "The report only lists real problems; nothing is invented.",
+        "The exported file now has a defects list and npm run check still passes."
+      ]
+    },
+    "L5": {
+      "name": "Workflow = BASELINE",
+      "time": "14:05-14:30",
+      "xp": 20,
+      "main": "Follow the WORKING RULES (plan first, then build, then audit). Add the approval workflow with states Draft, Submitted, Under Review, Pending HOD, Approved and Returned. Rules: Author submits from Draft; the Reviewer opens it (Under Review) and either forwards to HOD or returns with a comment; the HOD approves or returns with a comment; a Returned spec goes back to the Author, who edits and resubmits. Only the Author can edit content, and only in Draft or Returned. Enforce this on the server for every route and return HTTP 403 otherwise. Reviewer and HOD can add comments per section. Log every state change with user, role, time and comment, and show the log. Show a DRAFT watermark on the preview and print view until the status is Approved. Add a status timeline at the top and a dashboard of specs with their status. Keep GET /api/v1/health and POST /api/v1/generate working; run npm run verify once more at the end. Finally, export a final specforge_output.json, run npm run check and upload it on the submit page and update the README (how to run, AI tools used, which track).",
+      "if_broken": "The Reviewer can still edit. Find every route that changes content and block everyone except the Author there, on the server.",
+      "if_ugly": "Add a status timeline at the top showing the current state.",
+      "done_when": "Author submits, Reviewer returns with a comment, Author resubmits, Reviewer forwards, HOD approves. A Reviewer edit gets a 403. Tag your repo 'baseline'.",
+      "checks": [
+        "Author submits, Reviewer returns with a comment, Author resubmits, Reviewer forwards, HOD approves.",
+        "A Reviewer trying to edit gets HTTP 403 from the server.",
+        "The log shows user, role, time and comment for every change.",
+        "The DRAFT watermark disappears only when the status is Approved."
+      ]
+    }
+  },
+  "phase_2": {
+    "time": "14:35-15:45",
+    "rules": [
+      "Tag your repo 'baseline' at 14:30. Work after that is Phase 2.",
+      "Each improvement is its own commit that says in one line which score section it targets.",
+      "Resubmit to the leaderboard as often as you like. Only the best score counts. The board freezes at 15:45."
+    ],
+    "ideas": {
+      "matrix_30_points": [
+        "Look up the Bloom's level from a verb list in code first, and use the AI only for ambiguous verbs",
+        "Add a second AI pass where the model checks its own map against the mapping rules and fixes violations",
+        "Give the AI the assessment table and the lab list as evidence for PO-3, PO-5, PO-8 and PO-9"
+      ],
+      "defects_25_points": [
+        "Add more deterministic rules (typos in references, unit label mismatches, blueprint marks vs maximum marks, the extra section 10)",
+        "Make each defect carry the right source and section",
+        "Do not report problems that are not real: junk reports lose points"
+      ],
+      "other_sections": [
+        "Check hours and weightages add up",
+        "Make the summary mention every unit's theme",
+        "Make sure no template sample text is left anywhere"
+      ],
+      "generalise": [
+        "Create a non-lab course and a spec-only (no blueprint) case yourself and check your app handles them",
+        "Remove any assumption that is only true for the sample course"
+      ],
+      "product": [
+        "Side-by-side diff of the AI output and the original",
+        "Confidence flags on mapping cells",
+        "Version history",
+        "Accessible, mobile-friendly layout"
+      ]
+    }
+  },
+  "submission": {
+    "ways": [
+      "Sign in to the portal with Google. Upload specforge_output.json (80 points) and spec.html (20 points). Your repo link is on your profile.",
+      "Final ranking: the organisers run your code at your last commit before 15:45 (npm install, npm start, POST /api/v1/generate on the sample files) and grade what it returns. Uploads that your code cannot reproduce do not count."
+    ],
+    "scoring": "Out of 100: output file 80 (CO-PO-PSO map 24, defects 20, course details 8, course outcomes 8, hours and assessment 8, template 4, units 4, summary 4) and spec document 20 (template sections, no leftover sample text, right template, course details, course outcomes, map matches your JSON).",
+    "close": "15:45. The board at that moment is final, then verified by running your code.",
+    "if_score_is_zero": "Your file does not match the format. Read the errors shown, fix them and resubmit. The usual causes: input_id is not exactly SAMPLE, an extra key, a missing key, credits not written as 3:0:1, or a wrong defect code."
+  },
+  "readme_must_include": [
+    "How to run the app",
+    "AI tools you used",
+    "Which track you followed"
+  ],
+  "working_rules": "WORKING RULES (start every level with this): 1) Do not code yet. Write a short plan: the files you will change and 3 to 5 checks that prove this level works. 2) Wait for my OK, then build the smallest thing that meets the checks. 3) Run npm run typecheck, then run the app and try the checks yourself. 4) AUDIT: list anything from the checks or from this level that is missing, wrong or hard-coded, and fix it. 5) Tell me in two lines what works and what does not."
+}
